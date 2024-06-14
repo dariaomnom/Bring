@@ -16,10 +16,29 @@ DoubleDouble utilTwoSum(double a, double b) {
     return DoubleDouble(s, err);
 }
 
+//DoubleDouble add(const DoubleDouble& a, const DoubleDouble& b) {
+//    DoubleDouble s1 = utilTwoSum(a.hi, b.hi);
+//    DoubleDouble s2 = utilTwoSum(a.lo, b.lo);
+//    return utilTwoSum(s1.hi, s2.hi);
+//}
+
+//DoubleDouble add(const DoubleDouble& a, const DoubleDouble& b) {
+//    DoubleDouble s1 = utilTwoSum(a.hi, b.hi);
+//    DoubleDouble s2 = utilTwoSum(a.lo, b.lo);
+//    return utilTwoSum(s1.hi, s1.lo + s2.hi);
+//}
+
+DoubleDouble utilThreeSum(double a, double b, double c) {
+    DoubleDouble sum1 = utilTwoSum(a, b);
+    DoubleDouble sum2 = utilTwoSum(sum1.hi, c);
+    double err = sum1.lo + sum2.lo;
+    return DoubleDouble(sum2.hi, err);
+}
+
 DoubleDouble add(const DoubleDouble& a, const DoubleDouble& b) {
     DoubleDouble s1 = utilTwoSum(a.hi, b.hi);
     DoubleDouble s2 = utilTwoSum(a.lo, b.lo);
-    return utilTwoSum(s1.hi, s2.hi);
+    return utilThreeSum(s1.hi, s1.lo, s2.hi);
 }
 
 DoubleDouble utilTwoProd(double a, double b) {
@@ -95,7 +114,7 @@ DoubleDouble f_prime(const DoubleDouble& x) {
 }
 
 // Метод Ньютона
-DoubleDouble newton_method(double a, DoubleDouble x0, int max_iter = 1000, double tol = 1e-15) {
+DoubleDouble newton_method(double a, DoubleDouble x0, int max_iter = 1000, double tol = 1e-20) {
     for (int i = 0; i < max_iter; ++i) {
         DoubleDouble fx = f(x0, a);
         DoubleDouble fx_prime = f_prime(x0);
@@ -117,28 +136,33 @@ DoubleDouble newton_method(double a, DoubleDouble x0, int max_iter = 1000, doubl
 }
 
 // Метод хорд
-DoubleDouble secant_method(double a, DoubleDouble x0, DoubleDouble x1, int max_iter = 1000, double tol = 1e-15) {
+DoubleDouble secant_method(double a, DoubleDouble x0, DoubleDouble x1, int max_iter = 1000, double tol = 1e-20) {
     for (int i = 0; i < max_iter; ++i) {
         DoubleDouble fx0 = f(x0, a);
         DoubleDouble fx1 = f(x1, a);
 //        printf("Iter %d: \n from F(x) = %.40e   %.40e \n to   F(x) = %.40e   %.40e\n",  i+1, fx0.hi, fx0.lo, fx1.hi, fx1.lo);
 
         // denominator = f(x1) - f(x0)
-        DoubleDouble denom = add(fx1, DoubleDouble(-fx0.hi, -fx0.lo));
+//        DoubleDouble denom = add(fx1, DoubleDouble(-fx0.hi, -fx0.lo));
 
         // numerator = x1 - x0
-        DoubleDouble num = add(x1, DoubleDouble(-x0.hi, -x0.lo));
+//        DoubleDouble num = add(x1, DoubleDouble(-x0.hi, -x0.lo));
 
         // slope = denom / num
-        DoubleDouble slope = divide(denom, num);
+//        DoubleDouble slope = divide(denom, num);
 //        double slope_hi = denom.hi / num.hi;
 //        double slope_lo = (denom.lo / num.hi) - (denom.hi * num.lo / (num.hi * num.hi));
 
         // dx = f(x1) / slope
-        DoubleDouble dx = divide(DoubleDouble(-fx1.hi, -fx1.lo), slope);
+//        DoubleDouble dx = divide(DoubleDouble(-fx1.hi, -fx1.lo), slope);
 //        double dx_hi = -fx1.hi / slope_hi;
 //        double dx_lo = (-fx1.lo / slope_hi) - (fx1.hi * slope_lo / (slope_hi * slope_hi));
 //        DoubleDouble dx(dx_hi, dx_lo);
+
+        DoubleDouble denom = add(fx1, DoubleDouble(-fx0.hi, -fx0.lo));
+        DoubleDouble num = add(x1, DoubleDouble(-x0.hi, -x0.lo));
+        DoubleDouble slope = divide(denom, num);
+        DoubleDouble dx = divide(DoubleDouble(-fx1.hi, -fx1.lo), slope);
 
         x0 = x1;
         x1 = add(x1, dx);
