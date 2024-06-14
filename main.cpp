@@ -16,6 +16,15 @@ DoubleDouble utilTwoSum(double a, double b) {
     return DoubleDouble(s, err);
 }
 
+DoubleDouble add(const DoubleDouble& a, const DoubleDouble& b) {
+    DoubleDouble sum = utilTwoSum(a.hi, b.hi);
+    double s = sum.hi;
+    double e = sum.lo + a.lo + b.lo;
+    sum = utilTwoSum(s, e);
+    return sum;
+}
+
+
 //DoubleDouble add(const DoubleDouble& a, const DoubleDouble& b) {
 //    DoubleDouble s1 = utilTwoSum(a.hi, b.hi);
 //    DoubleDouble s2 = utilTwoSum(a.lo, b.lo);
@@ -28,18 +37,18 @@ DoubleDouble utilTwoSum(double a, double b) {
 //    return utilTwoSum(s1.hi, s1.lo + s2.hi);
 //}
 
-DoubleDouble utilThreeSum(double a, double b, double c) {
-    DoubleDouble sum1 = utilTwoSum(a, b);
-    DoubleDouble sum2 = utilTwoSum(sum1.hi, c);
-    double err = sum1.lo + sum2.lo;
-    return DoubleDouble(sum2.hi, err);
-}
-
-DoubleDouble add(const DoubleDouble& a, const DoubleDouble& b) {
-    DoubleDouble s1 = utilTwoSum(a.hi, b.hi);
-    DoubleDouble s2 = utilTwoSum(a.lo, b.lo);
-    return utilThreeSum(s1.hi, s1.lo, s2.hi);
-}
+//DoubleDouble utilThreeSum(double a, double b, double c) {
+//    DoubleDouble sum1 = utilTwoSum(a, b);
+//    DoubleDouble sum2 = utilTwoSum(sum1.hi, c);
+//    double err = sum1.lo + sum2.lo;
+//    return DoubleDouble(sum2.hi, err);
+//}
+//
+//DoubleDouble add(const DoubleDouble& a, const DoubleDouble& b) {
+//    DoubleDouble s1 = utilTwoSum(a.hi, b.hi);
+//    DoubleDouble s2 = utilTwoSum(a.lo, b.lo);
+//    return utilThreeSum(s1.hi, s1.lo, s2.hi);
+//}
 
 DoubleDouble utilTwoProd(double a, double b) {
     double p = a * b;
@@ -47,16 +56,23 @@ DoubleDouble utilTwoProd(double a, double b) {
     return DoubleDouble(p, err);
 }
 
-DoubleDouble multiply(const DoubleDouble& a, const DoubleDouble& b) {
+//DoubleDouble multiply(const DoubleDouble& a, const DoubleDouble& b) {
+////    DoubleDouble p1 = utilTwoProd(a.hi, b.hi);
+////    DoubleDouble p2 = utilTwoSum(a.hi * b.lo, a.lo * b.hi);
+////    DoubleDouble p3 = utilTwoSum(p1.lo, p2.hi);
+////    return utilTwoSum(p1.hi, p3.hi);
 //    DoubleDouble p1 = utilTwoProd(a.hi, b.hi);
-//    DoubleDouble p2 = utilTwoSum(a.hi * b.lo, a.lo * b.hi);
-//    DoubleDouble p3 = utilTwoSum(p1.lo, p2.hi);
-//    return utilTwoSum(p1.hi, p3.hi);
+//    DoubleDouble p2 = utilTwoProd(a.hi, b.lo);
+//    DoubleDouble p3 = utilTwoProd(a.lo, b.hi);
+//    DoubleDouble sum1 = add(p1, DoubleDouble(p2.hi + p3.hi, p2.lo + p3.lo));
+//    return add(sum1, DoubleDouble(0, p1.lo));
+//}
+
+DoubleDouble multiply(const DoubleDouble& a, const DoubleDouble& b) {
     DoubleDouble p1 = utilTwoProd(a.hi, b.hi);
-    DoubleDouble p2 = utilTwoProd(a.hi, b.lo);
-    DoubleDouble p3 = utilTwoProd(a.lo, b.hi);
-    DoubleDouble sum1 = add(p1, DoubleDouble(p2.hi + p3.hi, p2.lo + p3.lo));
-    return add(sum1, DoubleDouble(0, p1.lo));
+    p1.lo += a.hi * b.lo + a.lo * b.hi;
+    DoubleDouble prod = utilTwoSum(p1.hi, p1.lo);
+    return prod;
 }
 
 //DoubleDouble divide2(const DoubleDouble& a, const DoubleDouble& b) {
@@ -97,12 +113,19 @@ static DoubleDouble subtract(const DoubleDouble& x, const DoubleDouble& y){
 //}
 
 // f(x) = x^5 + x + a
+//DoubleDouble f(const DoubleDouble& x, double a) {
+//    DoubleDouble x2 = multiply(x, x);
+//    DoubleDouble x4 = multiply(x2, x2);
+//    DoubleDouble x5 = multiply(x4, x);
+//    DoubleDouble ax = utilTwoSum(a, x.hi);
+//    return add(x5, DoubleDouble(ax.hi, ax.lo + x.lo));
+//}
 DoubleDouble f(const DoubleDouble& x, double a) {
     DoubleDouble x2 = multiply(x, x);
     DoubleDouble x4 = multiply(x2, x2);
     DoubleDouble x5 = multiply(x4, x);
-    DoubleDouble ax = utilTwoSum(a, x.hi);
-    return add(x5, DoubleDouble(ax.hi, ax.lo + x.lo));
+    DoubleDouble result = add(x5, DoubleDouble(x.hi, x.lo));
+    return add(result, DoubleDouble(a, 0));
 }
 
 // Производная f(x)
@@ -114,7 +137,7 @@ DoubleDouble f_prime(const DoubleDouble& x) {
 }
 
 // Метод Ньютона
-DoubleDouble newton_method(double a, DoubleDouble x0, int max_iter = 1000, double tol = 1e-20) {
+DoubleDouble newton_method(double a, DoubleDouble x0, int max_iter = 1000, double tol = 1e-30) {
     for (int i = 0; i < max_iter; ++i) {
         DoubleDouble fx = f(x0, a);
         DoubleDouble fx_prime = f_prime(x0);
@@ -125,18 +148,27 @@ DoubleDouble newton_method(double a, DoubleDouble x0, int max_iter = 1000, doubl
         DoubleDouble dx = divide(DoubleDouble(-fx.hi, -fx.lo), fx_prime);
 
         x0 = add(x0, dx);
-        printf("Iter %d: \n x = %.16e   %.16e\n", i+1, x0.hi, x0.lo);
-        printf(" F(x) = %.16e   %.16e \n", fx.hi, fx.lo);
-//        printf("Newton Iteration %d: x = %.40e   %.40e\n", i+1, x0.hi, x0.lo);
+
         if (std::fabs(dx.hi) < tol && std::fabs(dx.lo) < tol) {
             break;
         }
+
+        if (std::fabs(fx.hi) < tol && std::fabs(fx.lo) < tol) {
+            break;
+        }
+
+        printf("Iter %d: \n x = %.16e   %.16e\n", i+1, x0.hi, x0.lo);
+        printf(" F(x) = %.16e   %.16e \n", fx.hi, fx.lo);
+//        printf("Newton Iteration %d: x = %.40e   %.40e\n", i+1, x0.hi, x0.lo);
+//        if (std::fabs(dx.hi) < tol && std::fabs(dx.lo) < tol) {
+//            break;
+//        }
     }
     return x0;
 }
 
 // Метод хорд
-DoubleDouble secant_method(double a, DoubleDouble x0, DoubleDouble x1, int max_iter = 1000, double tol = 1e-20) {
+DoubleDouble secant_method(double a, DoubleDouble x0, DoubleDouble x1, int max_iter = 1000, double tol = 1e-30) {
     for (int i = 0; i < max_iter; ++i) {
         DoubleDouble fx0 = f(x0, a);
         DoubleDouble fx1 = f(x1, a);
@@ -167,13 +199,21 @@ DoubleDouble secant_method(double a, DoubleDouble x0, DoubleDouble x1, int max_i
         x0 = x1;
         x1 = add(x1, dx);
 
+        if (std::fabs(dx.hi) < tol && std::fabs(dx.lo) < tol) {
+            break;
+        }
+
+        if (std::fabs(fx1.hi) < tol && std::fabs(fx1.lo) < tol) {
+            break;
+        }
+
 //        printf("Secant Iteration %d: x = %.40e   %.40e\n", i+1, x1.hi, x1.lo);
         printf("Iter %d: \n x = %.16e   %.16e\n", i+1, x1.hi, x1.lo);
         printf(" from F(x) = %.16e   %.16e \n to   F(x) = %.16e   %.16e\n", fx0.hi, fx0.lo, fx1.hi, fx1.lo);
 //        printf("Iter %d: \n from F(x) = %.40e   %.40e \n to   F(x) = %.40e   %.40e\n",  i+1, fx0.hi, fx0.lo, fx1.hi, fx1.lo);
-        if (std::fabs(dx.hi) < tol && std::fabs(dx.lo) < tol) {
-            break;
-        }
+//        if (std::fabs(dx.hi) < tol && std::fabs(dx.lo) < tol) {
+//            break;
+//        }
     }
     return x1;
 }
