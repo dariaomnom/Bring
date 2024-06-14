@@ -63,7 +63,7 @@ DoubleDouble f_prime(const DoubleDouble& x) {
 }
 
 // Метод Ньютона
-DoubleDouble newton_method(double a, DoubleDouble x0, int max_iter = 1000, double tol = 1e-30) {
+DoubleDouble newton_method(double a, DoubleDouble x0, int max_iter = 1000, double tol = 1e-32) {
     for (int i = 0; i < max_iter; ++i) {
         DoubleDouble fx = f(x0, a);
         DoubleDouble fx_prime = f_prime(x0);
@@ -72,9 +72,9 @@ DoubleDouble newton_method(double a, DoubleDouble x0, int max_iter = 1000, doubl
 
         x0 = add(x0, dx);
 
-        if (std::fabs(dx.hi) < tol && std::fabs(dx.lo) < tol) {
-            break;
-        }
+//        if (std::fabs(dx.hi) < tol && std::fabs(dx.lo) < tol) {
+//            break;
+//        }
 
 //        if (std::fabs(fx.hi) < tol && std::fabs(fx.lo) < tol) {
 //            break;
@@ -82,12 +82,18 @@ DoubleDouble newton_method(double a, DoubleDouble x0, int max_iter = 1000, doubl
 
         printf("Iter %d: \n x = %.40e   %.40e\n", i+1, x0.hi, x0.lo);
         printf(" F(x) = %.40e   %.40e \n", fx.hi, fx.lo);
+        printf(" dx/x = %.40e   %.40e \n", dx.hi / x0.hi, dx.lo / x0.lo);
+
+        // Условие остановки на основе относительного изменения
+        if (std::fabs(dx.hi / x0.hi) < tol && std::fabs(dx.lo / x0.lo) < tol) {
+            break;
+        }
     }
     return x0;
 }
 
 // Метод хорд
-DoubleDouble secant_method(double a, DoubleDouble x0, DoubleDouble x1, int max_iter = 1000, double tol = 1e-30) {
+DoubleDouble secant_method(double a, DoubleDouble x0, DoubleDouble x1, int max_iter = 1000, double tol = 1e-32) {
     for (int i = 0; i < max_iter; ++i) {
         DoubleDouble fx0 = f(x0, a);
         DoubleDouble fx1 = f(x1, a);
@@ -100,9 +106,9 @@ DoubleDouble secant_method(double a, DoubleDouble x0, DoubleDouble x1, int max_i
         x0 = x1;
         x1 = add(x1, dx);
 
-        if (std::fabs(dx.hi) < tol && std::fabs(dx.lo) < tol) {
-            break;
-        }
+//        if (std::fabs(dx.hi) < tol && std::fabs(dx.lo) < tol) {
+//            break;
+//        }
 
 //        if (std::fabs(fx0.hi) < tol && std::fabs(fx0.lo) < tol) {
 //            break;
@@ -114,6 +120,11 @@ DoubleDouble secant_method(double a, DoubleDouble x0, DoubleDouble x1, int max_i
 
         printf("Iter %d: \n x = %.40e   %.40e\n", i+1, x1.hi, x1.lo);
         printf(" from F(x) = %.40e   %.40e \n to   F(x) = %.40e   %.40e\n", fx0.hi, fx0.lo, fx1.hi, fx1.lo);
+        printf(" dx/x = %.40e   %.40e\n", dx.hi / x1.hi, dx.lo / x1.lo);
+
+        if (std::fabs(dx.hi / x1.hi) < tol && std::fabs(dx.lo / x1.lo) < tol) {
+            break;
+        }
     }
     return x1;
 }
