@@ -153,9 +153,9 @@ DoubleDouble newton_method(double a, DoubleDouble x0, int max_iter = 1000, doubl
             break;
         }
 
-        if (std::fabs(fx.hi) < tol && std::fabs(fx.lo) < tol) {
-            break;
-        }
+//        if (std::fabs(fx.hi) < tol && std::fabs(fx.lo) < tol) {
+//            break;
+//        }
 
         printf("Iter %d: \n x = %.16e   %.16e\n", i+1, x0.hi, x0.lo);
         printf(" F(x) = %.16e   %.16e \n", fx.hi, fx.lo);
@@ -203,9 +203,13 @@ DoubleDouble secant_method(double a, DoubleDouble x0, DoubleDouble x1, int max_i
             break;
         }
 
-        if (std::fabs(fx1.hi) < tol && std::fabs(fx1.lo) < tol) {
-            break;
-        }
+//        if (std::fabs(fx0.hi) < tol && std::fabs(fx0.lo) < tol) {
+//            break;
+//        }
+//
+//        if (std::fabs(fx1.hi) < tol && std::fabs(fx1.lo) < tol) {
+//            break;
+//        }
 
 //        printf("Secant Iteration %d: x = %.40e   %.40e\n", i+1, x1.hi, x1.lo);
         printf("Iter %d: \n x = %.16e   %.16e\n", i+1, x1.hi, x1.lo);
